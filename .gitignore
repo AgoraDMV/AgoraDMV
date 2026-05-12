@@ -1,0 +1,8 @@
+.claude/
+node_modules/
+.next/
+.env.local
+billtrax.db
+*.db
+*.env
+./docs-for-ai/
