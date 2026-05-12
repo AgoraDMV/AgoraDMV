@@ -6,8 +6,8 @@ Tools for tracking, comparing, and analyzing U.S. congressional appropriations b
 
 | Project | Type | What it does |
 |---|---|---|
-| [BillTrax](./BillTrax) | Next.js web app | Dashboard for tracking bills across legislative stages, comparing versions side-by-side, and tagging sections with AI. SQLite-backed with Auth.js authentication. |
-| [civic_tech_appropriations_bills](./civic_tech_appropriations_bills) | Python library & CLI | Downloads bill XML from Congress.gov, normalizes it into a section tree, diffs two versions, and outputs JSON or standalone HTML comparison reports. |
+| [BillTrax](https://github.com/AgoraDMV/BillTrax) | Next.js web app | Dashboard for tracking bills across legislative stages, comparing versions side-by-side, and tagging sections with AI. SQLite-backed with Auth.js authentication. |
+| [civic_tech_appropriations_bills](https://github.com/willhea/civic_tech_appropriations_bills) | Python library & CLI | Downloads bill XML from Congress.gov, normalizes it into a section tree, diffs two versions, and outputs JSON or standalone HTML comparison reports. |
 
 ## Architecture
 
