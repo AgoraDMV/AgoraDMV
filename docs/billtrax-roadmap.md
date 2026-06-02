@@ -6,7 +6,7 @@
 This document tracks what exists, what is broken, and what to build in priority order. Update it as phases complete.
 
 For product scope and audiences, see `BillTrax/docs/SCOPE.md`.  
-For the project relationship with `civic_tech_appropriations_bills`, see `docs/project-relationship.md`.  
+For the project relationship with `DeltaTrack`, see `docs/project-relationship.md`.  
 For user stories, see `BillTrax/docs-for-ai/user-stories.md`.
 
 ---

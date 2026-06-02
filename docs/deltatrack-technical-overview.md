@@ -1,4 +1,4 @@
-# civic_tech_appropriations_bills — Technical Overview
+# DeltaTrack — Technical Overview
 
 How the system works at a computer science level.
 

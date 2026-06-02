@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Two independent projects share this repo:
 
-- `civic_tech_appropriations_bills/` — Python library + CLI for downloading and diffing U.S. bill XML from Congress.gov; also the technical foundation for a Capitol Staffer browser tool (see below)
+- `DeltaTrack/` — Python library + CLI for downloading and diffing U.S. bill XML from Congress.gov; also the technical foundation for a Capitol Staffer browser tool (see below)
 - `BillTrax/` — Next.js 15 web app for tracking and comparing bills; includes a Node.js backend at `BillTrax/node_backend/`
 
-They share a Congress.gov API key but are otherwise independent. **They are not coupled in code, data model, or deployment.** Concepts flow from `civic_tech_appropriations_bills` toward BillTrax as design inspiration — not as shared libraries or copy-paste.
+They share a Congress.gov API key but are otherwise independent. **They are not coupled in code, data model, or deployment.** Concepts flow from `DeltaTrack` toward BillTrax as design inspiration — not as shared libraries or copy-paste.
 
 For the full rationale, see [`docs/project-relationship.md`](docs/project-relationship.md).  
 For the BillTrax build roadmap, see [`docs/billtrax-roadmap.md`](docs/billtrax-roadmap.md).
@@ -18,7 +18,7 @@ For the BillTrax build roadmap, see [`docs/billtrax-roadmap.md`](docs/billtrax-r
 
 ## Project Relationship at a Glance
 
-| | civic_tech_appropriations_bills | BillTrax |
+| | DeltaTrack | BillTrax |
 |---|---|---|
 | Audience | Capitol Hill staffers | External orgs, researchers, accountability-focused citizens |
 | Data | Private draft PDFs + public XML | Public Congress.gov data + uploaded public PDFs |
@@ -31,14 +31,14 @@ Congressional Tech's algorithms are the reference point for how BillTrax should 
 
 ---
 
-## civic_tech_appropriations_bills
+## DeltaTrack
 
-See `civic_tech_appropriations_bills/AGENTS.md` for full architecture details and test conventions.
+See `DeltaTrack/AGENTS.md` for full architecture details and test conventions.
 
 ### Commands
 
 ```bash
-cd civic_tech_appropriations_bills
+cd DeltaTrack
 uv sync                                   # Install dependencies (run once)
 uv run pytest -m "not slow"              # Fast unit tests (~1s, no bill files needed)
 uv run pytest                             # All tests (requires downloaded bill XML in bills/)
@@ -54,7 +54,7 @@ uv run python diff_bill.py compare old.xml new.xml --format html -o report.html
 
 ### Environment
 
-`civic_tech_appropriations_bills/.env`:
+`DeltaTrack/.env`:
 ```
 CONGRESS_API_KEY=your_key   # Free at api.congress.gov/sign-up/ — falls back to DEMO_KEY (30 req/hr)
 ```

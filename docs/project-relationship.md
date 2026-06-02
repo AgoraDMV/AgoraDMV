@@ -1,12 +1,12 @@
 # Project Relationship — Inspiration Without Coupling
 
-> How `civic_tech_appropriations_bills` and `BillTrax` relate to each other.
+> How `DeltaTrack` and `BillTrax` relate to each other.
 
 ---
 
 ## The Two Products
 
-### civic_tech_appropriations_bills (Congressional Tech)
+### DeltaTrack
 
 A Python library and CLI built for **Capitol Hill staffers** who need to work with appropriations bills — including private draft versions circulated before public introduction. The tool runs as a self-contained web page: once the page loads, it makes **no further server connections**. All bill content stays on the user's device. This is a hard privacy requirement because draft bills are sensitive pre-introduction documents.
 
@@ -84,7 +84,7 @@ BillTrax should eventually match and then exceed each of these capabilities on t
 
 When building a feature in BillTrax that has an analogue in Congressional Tech:
 
-1. **Read the Congressional Tech implementation first.** The Python code in `bill_tree.py` and `diff_bill.py` is the reference design. The technical overview in `docs/civic-tech-technical-overview.md` explains the reasoning.
+1. **Read the Congressional Tech implementation first.** The Python code in `bill_tree.py` and `diff_bill.py` is the reference design. The technical overview in `docs/deltatrack-technical-overview.md` explains the reasoning.
 2. **Adapt, don't port.** The Python code uses synchronous in-memory processing. BillTrax needs async TypeScript, DB persistence, and incremental computation. The logic translates; the architecture does not.
 3. **Leverage what the server gives you.** If Congressional Tech does something expensive on every run because it has no cache, BillTrax should do it once and store the result.
 4. **Keep them independent.** Do not create cross-project imports, shared configuration, or deployment dependencies. The shared insight is algorithmic, not structural.
