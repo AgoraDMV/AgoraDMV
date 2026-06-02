@@ -6,3 +6,4 @@ billtrax.db
 *.db
 *.env
 ./docs-for-ai/
+private/*
