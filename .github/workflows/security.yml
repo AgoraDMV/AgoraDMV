@@ -1,0 +1,107 @@
+name: security (monorepo)
+
+# Superproject dependency gate. Audits BOTH submodules' production dependencies;
+# the run fails if EITHER job fails. Mandatory check for the develop and main
+# branches (add both jobs as required status checks in branch protection).
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  billtrax:
+    name: BillTrax — npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          # Private submodules need a PAT with read access to the submodule
+          # repos, stored as a secret. If the submodules are public, delete the
+          # token line — the default GITHUB_TOKEN is enough.
+          token: ${{ secrets.SUBMODULE_PAT }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Deploy gate: BREAK the pipeline if BillTrax's PRODUCTION dependency tree
+      # ships a HIGH/critical advisory, and tell the developer to update the deps.
+      # `high` threshold — residual moderates are framework-bundled (postcss in
+      # next, next-auth v5 beta) with no stable fix yet. node_backend is gated
+      # tighter at `moderate`. See BillTrax/.github/workflows/security.yml.
+      - name: Security gate — block deploy on HIGH vulnerabilities
+        working-directory: BillTrax
+        shell: bash
+        run: |
+          fail=0
+          echo "::group::npm audit — app (production tree, fail level: high)"
+          npm audit --omit=dev --audit-level=high || fail=1
+          echo "::endgroup::"
+          echo "::group::npm audit — node_backend (production tree, fail level: moderate)"
+          ( cd node_backend && npm audit --omit=dev --audit-level=moderate ) || fail=1
+          echo "::endgroup::"
+          if [ "$fail" -ne 0 ]; then
+            {
+              echo "## ❌ Deployment blocked — vulnerable BillTrax production dependencies"
+              echo ""
+              echo "A **HIGH/critical** advisory (app) or a moderate+ advisory (node_backend) was found in a **production** dependency tree. This deploy is blocked until the dependencies are updated."
+              echo ""
+              echo "### Update the dependencies, then re-run this check"
+              echo '- `npm audit` (in `BillTrax/`) — full report'
+              echo '- `npm audit fix` — apply non-breaking fixes'
+              echo '- breaking fix: bump the package (or its parent) to a patched major and re-test'
+              echo '- `npx npm-check-updates -u && npm install` — move dependencies to latest'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "✅ No blocking vulnerabilities in BillTrax's production dependency trees."
+
+  deltatrack:
+    name: DeltaTrack — pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_PAT }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Export production requirements
+        working-directory: DeltaTrack
+        run: uv export --frozen --no-dev --no-emit-project --format requirements-txt -o requirements-prod.txt
+
+      # Deploy gate: BREAK the pipeline if any DeltaTrack production dependency
+      # ships a known advisory, and tell the developer to update the deps.
+      # (pip-audit has no severity-threshold flag, so it gates on ANY known
+      # advisory — at least as strict as a HIGH gate.)
+      - name: Security gate — block deploy on HIGH vulnerabilities
+        working-directory: DeltaTrack
+        shell: bash
+        run: |
+          if uvx pip-audit -r requirements-prod.txt; then
+            echo "✅ No known advisories in DeltaTrack's production dependency set."
+          else
+            {
+              echo "## ❌ Deployment blocked — vulnerable DeltaTrack production dependencies"
+              echo ""
+              echo "pip-audit found a known advisory in the **production** dependency set. This deploy is blocked until the dependencies are updated."
+              echo ""
+              echo "_(pip-audit has no severity threshold, so it blocks on any known advisory — at least as strict as a HIGH gate.)_"
+              echo ""
+              echo "### Update the dependencies, then re-run this check"
+              echo '- `uvx pip-audit -r requirements-prod.txt` (in `DeltaTrack/`) — full report'
+              echo '- bump the affected package in `pyproject.toml` to a patched version'
+              echo '- `uv lock --upgrade-package <name>` (or `uv lock --upgrade`), then commit `uv.lock`'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
